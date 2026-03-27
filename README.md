@@ -40,6 +40,7 @@ SpireLens2/
 ├── config.yaml            # 配置文件（如识别频率、透明度）
 ├── core/                  # 核心逻辑
 ├── ui/                    # 界面逻辑
+├── docs/                   # 技术文档库
 ├── anchors/               # 场景判断用的模板图片
 ├── data/                  # 存放提示语的 CSV 文件
 └── resources/             # 按钮图标等静态资源
