@@ -1,0 +1,59 @@
+# ==========================================
+# StS2-Visionary 全局配置体系
+# ==========================================
+
+# 1. 目标程序定义 (Target Process)
+# 框架将根据此信息锁定窗口句柄
+target_app:
+  # 窗口标题关键字（支持模糊匹配，测试时可改名为 "记事本"）
+  window_title: "Slay the Spire 2"
+  # 进程名（备用方案，用于更精确的过滤）
+  process_name: "StS2.exe"
+  # 采样频率 (单位: 秒)。0.5 表示每秒检测 2 次画面
+  scan_interval: 0.5
+
+# 2. 资源路径管理 (Resource Paths)
+# 所有的资源引用均基于此相对路径
+paths:
+  # 场景特征锚点图所在目录
+  anchors_dir: "./anchors"
+  # 提示语 CSV 数据库路径
+  database_csv: "./data/main_tips.csv"
+  # 日志存储路径
+  log_file: "./logs/runtime.log"
+  # 调试截图保存目录 (仅在 debug 开启时有效)
+  debug_output: "./debug_temp"
+
+# 3. OCR 识别引擎设置 (OCR Engine)
+ocr_settings:
+  # 识别语言选择: 'ch' (中英混合), 'en' (纯英文)
+  lang: "ch"
+  # GPU 加速开关 (需环境支持，默认推荐 false 以维持打包兼容性)
+  use_gpu: false
+  # 置信度门槛 (0.0 - 1.0)。低于此值的识别结果将被视为无效，防止噪音干扰
+  confidence_threshold: 0.6
+  # 文字框检测灵敏度 (通常无需修改)
+  det_limit_side_len: 960
+
+# 4. 视觉感知参数 (Visual Perception)
+vision_settings:
+  # 场景判定阈值：SIFT 特征点匹配成功的最小数量
+  sift_match_threshold: 15
+  # 画面静止判定：哈希变动率阈值，低于此值则不执行 OCR (节省 CPU)
+  hash_delta_threshold: 5
+  # 默认参考分辨率（基准高度，用于归一化计算）
+  base_height: 1080
+
+# 5. UI 与 覆盖层表现 (UI & Overlay)
+ui_settings:
+  # 悬浮控制按钮的初始坐标 [x, y]
+  float_btn_start_pos: [50, 50]
+  # 提示框透明度 (0.0 - 1.0)
+  overlay_opacity: 0.85
+  # 提示框背景色 (RGBA)
+  theme_color: [40, 40, 40, 200]
+  # 提示文字停留时间 (秒)，若设置为 -1 则直到场景退出才消失
+  tip_display_duration: 8.0
+
+# 6. 系统开关 (Global Switches)
+debug_mode: true

@@ -35,44 +35,16 @@
 ## 📂 项目结构
 
 ```text
-SpireLens2/
+StS2-Visionary/
 ├── main.py                # 启动程序
-├── config.yaml            # 配置文件（如识别频率、透明度）
+├── config.yaml            # 配置文件
 ├── core/                  # 核心逻辑
 ├── ui/                    # 界面逻辑
-├── docs/                   # 技术文档库
+├── utils/                 # 工具类（新增：日志管理逻辑放在这里）
+│   └── logger_init.py     # 日志初始化脚本
+├── docs/                  # 技术文档库
+├── logs/                  # 日志存储目录（自动生成：保留最近5天）
 ├── anchors/               # 场景判断用的模板图片
-├── data/                  # 存放提示语的 CSV 文件
-└── resources/             # 按钮图标等静态资源
+├── data/                  # 提示语 CSV 文件
+└── resources/             # 静态资源
 ```
-
----
-
-## 📝 待办清单 (Roadmap)
-
-#### 第一阶段：底层框架与数据中枢（进行中）
-- [x] 项目模块化架构设计
-- [ ] **Data Manager**: 实现基于 `difflib` 的 CSV 模糊匹配引擎
-- [ ] **Data Manager**: 支持多场景（Shop/Reward/Neow/Boss）的提示语解析
-- [ ] **Config System**: 支持 `yaml` 配置文件（保存透明度、识别频率、快捷键等）
-
-#### 第二阶段：视觉环境感知（核心难点）
-- [ ] **Scene Detector**: 实现商店与普通选牌场景的 SIFT 模板匹配
-- [ ] **Scene Detector**: 采集并增加 **“开局涅奥界面”** 与 **“BOSS 遗物选择界面”** 的锚点特征
-- [ ] **OCR Engine**: 整合 PaddleOCR，实现针对《尖塔2》特定字体（如能量槽、价格数字）的微调识别
-- [ ] **Coordinate Mapper**: 建立坐标转换系统，将 OCR 的相对坐标映射至屏幕绝对物理像素
-
-#### 第三阶段：UI 交互与渲染
-- [ ] **Floating Button**: 实现可拖动的局内悬浮球，支持右键菜单
-- [ ] **Overlay**: 开发全屏透明穿透图层，解决鼠标点击穿透（TransparentForInput）问题
-- [ ] **Overlay**: 设计“智能气泡框”，根据识别位置自动计算弹出方向（防止遮挡文字）
-
-#### 第四阶段：整合与优化
-- [ ] **Multi-threading**: 将 OCR 与特征匹配放入独立线程，防止 UI 界面卡死
-- [ ] **Performance**: 引入场景哈希对比，若画面未变化则跳过 OCR，降低 CPU 占用
-- [ ] **Deployment**: 使用 Nuitka 打包为单文件 EXE，内置 Paddle 预测库与模型
----
-
-> **💡 开发备忘：**
-> * 由于《杀戮尖塔 2》可能存在不同的分辨率设置，`anchors` 里的图片需要具备一定的代表性。
-> * 打包时需注意 PaddleOCR 的模型文件路径引用。
