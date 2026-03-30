@@ -6,9 +6,11 @@
 # 框架将根据此信息锁定窗口句柄
 target_app:
   # 窗口标题关键字（支持模糊匹配，测试时可改名为 "记事本"）
-  window_title: "Slay the Spire 2"
+  # window_title: "Slay the Spire 2"
+  window_title: "ndd"
   # 进程名（备用方案，用于更精确的过滤）
-  process_name: "StS2.exe"
+  # process_name: "StS2.exe"
+  process_name: "Notepad--.exe"
   # 采样频率 (单位: 秒)。0.5 表示每秒检测 2 次画面
   scan_interval: 0.5
 

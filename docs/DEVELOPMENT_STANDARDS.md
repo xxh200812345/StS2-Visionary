@@ -9,7 +9,19 @@
 为了消除 `Trailing whitespace` 和 `Missing final newline` 等低级规范错误，项目强制使用 **Black Formatter**。
 
 ### 1.1 配置文件 `.vscode/settings.json`
-在根目录下创建此文件，内容如下：
+在根目录下创建此文件，内容如下：StS2-Visionary/
+├── main.py                # 启动程序
+├── config.yaml            # 配置文件
+├── core/                  # 核心逻辑
+├── ui/                    # 界面逻辑
+├── utils/                 # 工具类（新增：日志管理逻辑放在这里）
+│   └── logger_init.py     # 日志初始化脚本
+├── docs/                  # 技术文档库
+├── logs/                  # 日志存储目录（自动生成：保留最近5天）
+├── anchors/               # 场景判断用的模板图片
+├── data/                  # 提示语 CSV 文件
+└── resources/             # 静态资源
+
 
 ```json
 {
@@ -27,7 +39,7 @@
     "python.linting.pylintEnabled": true,
     "pylint.args": [
         "--max-line-length=120",
-        "--disable=C0114,C0116,R0903" 
+        "--disable=C0114,C0116,R0903"
     ]
 }
 ```
