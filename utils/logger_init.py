@@ -5,43 +5,27 @@ StS2-Visionary 日志管理模块
 
 import logging
 from logging.handlers import TimedRotatingFileHandler
-import os
+from utils.constants import ROOT_DIR, LOG_DIR_NAME, LOG_FILE_NAME, LOG_BACKUP_COUNT, LOG_ROTATION_WHEN, PROJECT_NAME
 
 
 def setup_logger():
-    """
-    配置并初始化日志处理器。
-    设置 TimedRotatingFileHandler 以实现日志的自动轮转和清理。
-    """
-    log_dir = "logs"
-    if not os.path.exists(log_dir):
-        os.makedirs(log_dir)
+    # 路径语义化拼接
+    log_dir = ROOT_DIR / LOG_DIR_NAME
+    log_file = log_dir / LOG_FILE_NAME
 
-    log_file = os.path.join(log_dir, "sts2_visionary.log")
+    # 自动创建目录
+    log_dir.mkdir(parents=True, exist_ok=True)
 
-    # 创建全局 logger 实例，内部命名避免与外部变量冲突
-    _logger = logging.getLogger("StS2_Visionary")
-    _logger.setLevel(logging.DEBUG)
+    _logger = logging.getLogger(PROJECT_NAME)
+    _logger.setLevel(logging.INFO)
 
-    # 防止重复添加 Handler
     if not _logger.handlers:
-        # 核心配置：按天轮转 (D)，间隔 1 天，保留 5 个备份
         file_handler = TimedRotatingFileHandler(
-            log_file, when='D', interval=1, backupCount=5, encoding='utf-8'
+            str(log_file), when=LOG_ROTATION_WHEN, interval=1, backupCount=LOG_BACKUP_COUNT, encoding="utf-8"
         )
-
-        # 设置日志格式
-        formatter = logging.Formatter(
-            '%(asctime)s - %(levelname)s - [%(module)s] - %(message)s'
-        )
-        file_handler.setFormatter(formatter)
-
-        # 控制台输出
-        console_handler = logging.StreamHandler()
-        console_handler.setFormatter(formatter)
-
+        # ... 后续 formatter 设置 ...
         _logger.addHandler(file_handler)
-        _logger.addHandler(console_handler)
+        _logger.addHandler(logging.StreamHandler())
 
     return _logger
 

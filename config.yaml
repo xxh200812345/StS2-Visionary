@@ -18,13 +18,13 @@ target_app:
 # 所有的资源引用均基于此相对路径
 paths:
   # 场景特征锚点图所在目录
-  anchors_dir: "./anchors"
-  # 提示语 CSV 数据库路径
-  database_csv: "./data/main_tips.csv"
+  anchors_dir: "./resources/anchors"
+  # 提示语 CSV 数据库所在目录
+  database_csv_dir: "./resources/data"
   # 日志存储路径
-  log_file: "./logs/runtime.log"
+  log_file: "./logs/app_info.log"
   # 调试截图保存目录 (仅在 debug 开启时有效)
-  debug_output: "./debug_temp"
+  debug_output: "./output/debug_temp"
 
 # 3. OCR 识别引擎设置 (OCR Engine)
 ocr_settings:

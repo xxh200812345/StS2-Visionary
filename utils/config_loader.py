@@ -3,18 +3,17 @@ StS2-Visionary 配置加载模块
 提供全局统一的对象化配置访问入口。
 """
 
-from pathlib import Path
 from types import SimpleNamespace
 import yaml
 from utils.logger_init import logger
+from utils.constants import CONFIG_PATH
 
 
 class ConfigManager:
     """配置管理类，实现单例加载并转换为对象格式"""
 
     _config = None
-    ROOT_DIR = Path(__file__).resolve().parent.parent
-    CONFIG_PATH = ROOT_DIR / "config.yaml"
+    CONFIG_PATH = CONFIG_PATH
 
     @staticmethod
     def _dict_to_obj(data):

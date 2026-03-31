@@ -3,15 +3,20 @@ StS2-Visionary 窗口捕获模块
 负责通过模糊标题和进程名锁定窗口，并进行后台截图。
 """
 
+import ctypes
+import time
 import win32con
 import win32gui
 import win32process
 import win32ui
-import pywintypes
 import psutil
 from PIL import Image
 from utils.logger_init import logger
-from utils.config_loader import get_config
+from utils import CFG
+
+
+# 解决高分屏截图错位或尺寸不对的问题
+ctypes.windll.user32.SetProcessDPIAware()
 
 # pylint: disable=no-member
 
@@ -42,31 +47,24 @@ def find_window_fuzzy(title_keyword: str, process_name: str):
 
 
 def capture_window(title_keyword: str, process_name: str):
-    """
-    捕获指定条件的窗口并返回 PIL Image 对象。
-
-    Args:
-        title_keyword: 窗口标题包含的关键字。
-        process_name: 进程名（如 Notepad--.exe）。
-    """
     try:
-        # 1. 寻找匹配的窗口句柄
         hwnd = find_window_fuzzy(title_keyword, process_name)
-
         if not hwnd:
-            logger.warning("未找到匹配标题关键字 [%s] 且进程名为 [%s] 的窗口", title_keyword, process_name)
+            logger.warning("未找到匹配窗口: [%s]", title_keyword)
             return None
 
-        # 2. 获取窗口尺寸
+        # 如果窗口被最小化，尝试恢复它（可选，如果不希望干扰用户可去掉）
+        if win32gui.IsIconic(hwnd):
+            logger.info("窗口处于最小化状态，尝试恢复...")
+            win32gui.ShowWindow(hwnd, win32con.SW_RESTORE)
+            time.sleep(0.1)  # 等待窗口重绘
+
+        # 获取窗口精确坐标
         left, top, right, bottom = win32gui.GetWindowRect(hwnd)
         width = right - left
         height = bottom - top
 
-        if width <= 0 or height <= 0:
-            logger.error("窗口尺寸异常，窗口可能已被最小化")
-            return None
-
-        # 3. Win32 截图核心逻辑
+        # 核心修正：改用 PrintWindow 方式
         hwnd_dc = win32gui.GetWindowDC(hwnd)
         mfc_dc = win32ui.CreateDCFromHandle(hwnd_dc)
         save_dc = mfc_dc.CreateCompatibleDC()
@@ -75,16 +73,18 @@ def capture_window(title_keyword: str, process_name: str):
         save_bit_map.CreateCompatibleBitmap(mfc_dc, width, height)
         save_dc.SelectObject(save_bit_map)
 
-        # 执行拷贝
-        result = save_dc.BitBlt((0, 0), (width, height), mfc_dc, (0, 0), win32con.SRCCOPY)
+        # 修正点：使用 PrintWindow
+        # 参数 2 表示捕获整个窗口（包括非客户区）
+        # 如果依然空白，尝试将 2 改为 0 或 3
+        result = ctypes.windll.user32.PrintWindow(hwnd, save_dc.GetSafeHdc(), 3)
 
-        if result == 0:
-            logger.error("BitBlt 拷贝操作失败")
-            return None
+        if not result:
+            logger.error("PrintWindow 捕获失败，尝试 BitBlt 兜底...")
+            save_dc.BitBlt((0, 0), (width, height), mfc_dc, (0, 0), win32con.SRCCOPY)
 
-        # 4. 转换为 PIL Image
         bmp_info = save_bit_map.GetInfo()
         bmp_str = save_bit_map.GetBitmapBits(True)
+
         img = Image.frombuffer(
             "RGB",
             (bmp_info["bmWidth"], bmp_info["bmHeight"]),
@@ -95,7 +95,7 @@ def capture_window(title_keyword: str, process_name: str):
             1,
         )
 
-        # 5. 资源释放
+        # 资源清理
         win32gui.DeleteObject(save_bit_map.GetHandle())
         save_dc.DeleteDC()
         mfc_dc.DeleteDC()
@@ -103,18 +103,12 @@ def capture_window(title_keyword: str, process_name: str):
 
         return img
 
-    except pywintypes.error as e:
-        logger.error("Win32 API 调用失败: %s", e)
-        return None
     except Exception as e:
-        # pylint: disable=broad-exception-caught
-        logger.critical("窗口捕获发生未预期异常: %s", e, exc_info=True)
+        logger.error("截图失败: %s", e)
         return None
 
 
 if __name__ == "__main__":
-    # 使用对象化访问的配置
-    CFG = get_config()
 
     # 从配置中提取两个参数
     t_title = CFG.target_app.window_title
